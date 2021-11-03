@@ -1,10 +1,20 @@
-const AlbumItem = ({ artistName, albumName, albumPrice, currency }) => {
+const AlbumItem = ({
+  artwork,
+  albumName,
+  trackCount,
+  albumPrice,
+  currency,
+  explicit,
+}) => {
   return (
     <div>
-      <p>{artistName}</p>
+      <img src={artwork} alt={albumName} />
       <p>{albumName}</p>
-      <p>{albumPrice}</p>
-      <p>{currency}</p>
+      <p>{trackCount}</p>
+      <p>
+        {albumPrice} {currency}
+      </p>
+      {explicit === "explicit" ? <p>True</p> : <p>False</p>}
     </div>
   );
 };

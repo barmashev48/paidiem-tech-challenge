@@ -1,23 +1,23 @@
 import useInput from "../hooks/useInput";
 import axios from "axios";
 import { useState } from "react";
-import AlbumsList from "./AlbumsList";
-import AlbumItem from "./AlbumItem";
-
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
+import { albumsActions } from "../store/albumsSlice";
 
 const Form = () => {
-  // const dispatch = useDispatch();
-  const [albumsList, setAlbumsList] = useState([]);
+  const dispatch = useDispatch();
 
   const {
-    value: enteredName,
-    isValueValid: nameIsValid,
-    hasError: nameHasError,
-    reset: nameReset,
-    inputChangeHandler: nameInputChangeHandler,
-    blurHandler: nameBlurHandler,
-  } = useInput((value) => value.trim() !== "");
+    value: enteredCountry,
+    isValueValid: countryIsValid,
+    hasError: countryHasError,
+    reset: countryReset,
+    inputChangeHandler: countryInputChangeHandler,
+    blurHandler: countryBlurHandler,
+  } = useInput(
+    (value) =>
+      typeof value === "string" && value.length <= 3 && value.length > 0
+  );
 
   const {
     value: enteredId,
@@ -28,93 +28,94 @@ const Form = () => {
     blurHandler: idBlurHandler,
   } = useInput((value) => /^\d+$/.test(value));
 
-  let formIsValid = true;
+  let formIsValid = false;
+  console.log(countryIsValid);
 
-  // if (nameIsValid && emailIsValid && amountIsValid) {
-  //   formIsValid = true;
-  // }
+  if (idIsValid && countryIsValid) {
+    formIsValid = true;
+  }
 
-  const apiCall = () => {
-    //itunes.apple.com/lookup?id=909253&entity=album
-    axios({
-      url: `https://itunes.apple.com/lookup?id=${enteredId}&entity=album`,
-      // params: {
-      //   id: enteredId,
-      //   entity: "album",
-      // },
-    }).then((res) => {
-      console.log(res.data.results);
-      setAlbumsList(res.data.results);
-    });
+  const apiCall = async () => {
+    const [albumsResponse, currencyResponse] = await Promise.all([
+      axios.get(
+        `https://itunes.apple.com/lookup?id=${enteredId}&entity=album&country=${enteredCountry}`
+      ),
+      axios.get(`https://restcountries.com/v3.1/alpha/${enteredCountry}`),
+    ]);
+
+    const currencyObj = currencyResponse.data[0].currencies;
+    const currencyName = currencyObj[Object.keys(currencyObj)[0]].name;
+
+    const finalAlbumsList = albumsResponse.data.results
+      .filter((el, index) => index !== 0)
+      .map((el, index) => {
+        console.log(el);
+        return {
+          id: el.collectionId,
+          artistName: el.artistName,
+          artistLink: el.artistViewUrl,
+          albumName: el.collectionName,
+          albumLink: el.collectionViewUrl,
+          artwork: el.artworkUrl100,
+          trackCount: el.trackCount,
+          explicit: el.collectionExplicitness,
+          albumPrice: el.collectionPrice,
+          currency: currencyName,
+        };
+      });
+
+    dispatch(albumsActions.addAlbums(finalAlbumsList));
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
     apiCall();
-    nameReset();
-
+    countryReset();
     idReset();
   };
-  const nameInputClasses = nameHasError
+  const countryInputClasses = countryHasError
     ? "form-control invalid"
     : "form-control";
 
-  const amountInputClasses = idHasError
-    ? "form-control invalid"
-    : "form-control";
+  const idInputClasses = idHasError ? "form-control invalid" : "form-control";
+
+  console.log(formIsValid);
 
   return (
-    <div>
-      <form onSubmit={submitHandler}>
-        <h1>iTunes</h1>
-        <div className={amountInputClasses}>
-          <label htmlFor="amount">Artist ID:</label>
-          <input
-            type="text"
-            id="amount"
-            value={enteredId}
-            onBlur={idBlurHandler}
-            onChange={idInputChangeHandler}
-          />
-          {!!idHasError && (
-            <p className="error-text">Amount field has an error</p>
-          )}
-        </div>
-        {/* <div className="control-group">
-        <div className={nameInputClasses}>
+    <form onSubmit={submitHandler}>
+      <h1>iTunes</h1>
+      <div className={idInputClasses}>
+        <label htmlFor="artistId">Artist ID:</label>
+        <input
+          type="text"
+          id="artistId"
+          value={enteredId}
+          onBlur={idBlurHandler}
+          onChange={idInputChangeHandler}
+        />
+        {!!idHasError && (
+          <p className="error-text">Artist ID field has an error</p>
+        )}
+      </div>
+      <div className="control-group">
+        <div className={countryInputClasses}>
           <label htmlFor="name">Country:</label>
           <input
             type="text"
             id="name"
-            value={enteredName}
-            onBlur={nameBlurHandler}
-            onChange={nameInputChangeHandler}
+            value={enteredCountry}
+            onBlur={countryBlurHandler}
+            onChange={countryInputChangeHandler}
           />
-          {!!nameHasError && (
+          {!!countryHasError && (
             <p className="error-text">Name field must not be empty</p>
           )}
         </div>
-      </div> */}
-        <div className="form-actions">
-          <button disabled={!formIsValid}>Submit</button>
-        </div>
-      </form>
-      {albumsList.map((el, index) => {
-        if (index === 0) {
-          return;
-        }
-
-        return (
-          <AlbumItem
-            key={el.collectionId}
-            artistName={el.artistName}
-            albumName={el.collectionName}
-            albumPrice={el.collectionPrice}
-            currency={el.currency}
-          />
-        );
-      })}
-    </div>
+      </div>
+      <div className="form-actions">
+        <button disabled={!formIsValid}>Submit</button>
+      </div>
+    </form>
   );
 };
 export default Form;
