@@ -83,7 +83,7 @@ const Form = () => {
 
   return (
     <form onSubmit={submitHandler}>
-      <h1>iTunes</h1>
+      <h1>Album Search Page</h1>
       <div className={idInputClasses}>
         <label htmlFor="artistId">Artist ID:</label>
         <input
@@ -108,7 +108,7 @@ const Form = () => {
             onChange={countryInputChangeHandler}
           />
           {!!countryHasError && (
-            <p className="error-text">Name field must not be empty</p>
+            <p className="error-text">Country field has an error</p>
           )}
         </div>
       </div>

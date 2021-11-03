@@ -12,7 +12,11 @@ code {
     monospace;
 }
 
-body {
+.mobile-only {
+  display: none;
+}
+
+.App {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,6 +25,7 @@ body {
 form {
   max-width: 700px;
   text-align: center;
+  margin-bottom: 30px;
 }
 
 .form-control {
@@ -107,4 +112,100 @@ button:disabled:active {
 
 .error-text {
   color: #b40e0e;
+}
+
+.albums-list {
+  width: 90%;
+  max-width: 1200px;
+}
+
+.album-item {
+  display: flex;
+  max-width: 1200px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px auto;
+  background-color: #f6f5fa;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.album-name,
+.legend-album-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 250px;
+  text-align: center;
+  margin: auto 10px;
+}
+
+.legend-alb .track-count,
+.legend-track-count {
+  width: 90px;
+}
+
+.price,
+.legend-price {
+  width: 200px;
+}
+.explicit,
+.legend-explicit {
+  width: 90px;
+}
+
+.legend {
+  font-weight: bold;
+  display: flex;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px auto 0 auto;
+  padding: 0 20px;
+}
+
+.legend-artwork {
+  width: 100px;
+}
+
+@media only screen and (max-width: 810px) {
+  form {
+    width: 95%;
+    margin: 0 auto;
+  }
+
+  .form-control input,
+  .form-control select {
+    width: auto;
+  }
+
+  .mobile-only {
+    display: inline;
+  }
+
+  .legend {
+    display: none;
+  }
+
+  .album-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .album-item p {
+    margin: 5px;
+  }
+
+  .album-name {
+    margin: 10px;
+    text-align: center;
+  }
+
+  .price {
+    width: auto;
+  }
+
+  .explicit {
+    width: auto;
+  }
 }

@@ -9,10 +9,20 @@ const AlbumsList = () => {
 
   console.log(albumsList);
   return (
-    <div>
+    <div className="albums-list">
       <a href={artistLink} target="_blank">
         <h2>{artistName}</h2>
       </a>
+      {albumsList.length > 0 && (
+        <div className="legend">
+          <p className="legend-artwork">Artwork</p>
+          <p className="legend-album-name">Album Name</p>
+          <p className="legend-track-count">Track Count</p>
+          <p className="legend-price">Price</p>
+          <p className="legend-explicit">Explicit</p>
+        </div>
+      )}
+
       {albumsList.map((el, index) => {
         return (
           <AlbumItem
@@ -23,6 +33,7 @@ const AlbumsList = () => {
             albumPrice={el.albumPrice}
             currency={el.currency}
             explicit={el.explicit}
+            albumLink={el.albumLink}
           />
         );
       })}
