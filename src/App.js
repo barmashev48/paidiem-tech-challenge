@@ -14,8 +14,8 @@ function App() {
     <div className="App">
       <Form />
       {isSearching && <p>Searching...</p>}
-      {!apiCallHasError && <AlbumsList />}
       {apiCallHasError && <p>Please enter valid artist ID and country code</p>}
+      {!apiCallHasError && <AlbumsList />}
     </div>
   );
 }

@@ -7,10 +7,9 @@ const AlbumsList = () => {
   const artistName = useSelector((state) => state.albumsReducer.artistName);
   const artistLink = useSelector((state) => state.albumsReducer.artistLink);
 
-  console.log(albumsList);
   return (
     <div className="albums-list">
-      <a href={artistLink} target="_blank">
+      <a href={artistLink} target="_blank" rel="noreferrer">
         <h2>{artistName}</h2>
       </a>
       {albumsList.length > 0 && (

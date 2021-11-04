@@ -10,7 +10,12 @@ const AlbumItem = ({
   return (
     <div className="album-item">
       <img src={artwork} alt={albumName} />
-      <a href={albumLink} className="album-name" target="_blank">
+      <a
+        href={albumLink}
+        className="album-name"
+        target="_blank"
+        rel="noreferrer"
+      >
         {albumName}
       </a>
       <p className="track-count">

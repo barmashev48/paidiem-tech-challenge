@@ -1,6 +1,5 @@
 import useInput from "../hooks/useInput";
 import axios from "axios";
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { albumsActions } from "../store/albumsSlice";
 
@@ -16,7 +15,7 @@ const Form = () => {
     blurHandler: countryBlurHandler,
   } = useInput(
     (value) =>
-      typeof value === "string" && value.length <= 3 && value.length > 0
+      value.length <= 3 && value.length > 0 && /^[a-zA-Z]+$/.test(value)
   );
 
   const {
@@ -41,6 +40,7 @@ const Form = () => {
           `https://itunes.apple.com/lookup?id=${enteredId}&entity=album&country=${enteredCountry}`
         )
         .catch((error) => {
+          console.log(error);
           dispatch(albumsActions.finishedSearching());
           dispatch(albumsActions.apiCallHasError());
         }),
@@ -66,6 +66,11 @@ const Form = () => {
             currency: currencyName,
           };
         });
+
+      if (albumsResponse.data.results.length === 0) {
+        dispatch(albumsActions.finishedSearching());
+        dispatch(albumsActions.apiCallHasError());
+      }
       dispatch(albumsActions.finishedSearching());
       dispatch(albumsActions.addAlbums(finalAlbumsList));
     }
