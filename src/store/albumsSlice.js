@@ -13,10 +13,10 @@ const albumsSlice = createSlice({
   initialState,
   reducers: {
     addAlbums(state, action) {
-      if (action.payload) {
+      if (action.payload.length > 0) {
         state.items = action.payload;
-        // state.artistLink = action.payload[0].artistLink;
-        // state.artistName = action.payload[0].artistName;
+        state.artistLink = action.payload[0].artistLink;
+        state.artistName = action.payload[0].artistName;
       }
     },
     apiCallHasError(state, action) {

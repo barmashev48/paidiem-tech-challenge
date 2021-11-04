@@ -15,5 +15,3 @@ A site that allows user to search for an artists album with prices in a specifie
 
 1. Run **npm run build**
 1. Run **npm run deploy**
-
-Live link : https://paidiem-challenge.netlify.app/
