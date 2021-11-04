@@ -29,7 +29,6 @@ const Form = () => {
   } = useInput((value) => /^\d+$/.test(value));
 
   let formIsValid = false;
-  console.log(countryIsValid);
 
   if (idIsValid && countryIsValid) {
     formIsValid = true;
@@ -37,38 +36,45 @@ const Form = () => {
 
   const apiCall = async () => {
     const [albumsResponse, currencyResponse] = await Promise.all([
-      axios.get(
-        `https://itunes.apple.com/lookup?id=${enteredId}&entity=album&country=${enteredCountry}`
-      ),
+      axios
+        .get(
+          `https://itunes.apple.com/lookup?id=${enteredId}&entity=album&country=${enteredCountry}`
+        )
+        .catch((error) => {
+          dispatch(albumsActions.finishedSearching());
+          dispatch(albumsActions.apiCallHasError());
+        }),
       axios.get(`https://restcountries.com/v3.1/alpha/${enteredCountry}`),
     ]);
 
-    const currencyObj = currencyResponse.data[0].currencies;
-    const currencyName = currencyObj[Object.keys(currencyObj)[0]].name;
-
-    const finalAlbumsList = albumsResponse.data.results
-      .filter((el, index) => index !== 0)
-      .map((el, index) => {
-        console.log(el);
-        return {
-          id: el.collectionId,
-          artistName: el.artistName,
-          artistLink: el.artistViewUrl,
-          albumName: el.collectionName,
-          albumLink: el.collectionViewUrl,
-          artwork: el.artworkUrl100,
-          trackCount: el.trackCount,
-          explicit: el.collectionExplicitness,
-          albumPrice: el.collectionPrice,
-          currency: currencyName,
-        };
-      });
-
-    dispatch(albumsActions.addAlbums(finalAlbumsList));
+    if (albumsResponse && currencyResponse) {
+      const currencyObj = currencyResponse.data[0].currencies;
+      const currencyName = currencyObj[Object.keys(currencyObj)[0]].name;
+      const finalAlbumsList = albumsResponse.data.results
+        .filter((el, index) => index !== 0)
+        .map((el, index) => {
+          return {
+            id: el.collectionId,
+            artistName: el.artistName,
+            artistLink: el.artistViewUrl,
+            albumName: el.collectionName,
+            albumLink: el.collectionViewUrl,
+            artwork: el.artworkUrl100,
+            trackCount: el.trackCount,
+            explicit: el.collectionExplicitness,
+            albumPrice: el.collectionPrice,
+            currency: currencyName,
+          };
+        });
+      dispatch(albumsActions.finishedSearching());
+      dispatch(albumsActions.addAlbums(finalAlbumsList));
+    }
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
+    dispatch(albumsActions.apiCallHasNoError());
+    dispatch(albumsActions.startedSearching());
     apiCall();
     countryReset();
     idReset();
@@ -78,8 +84,6 @@ const Form = () => {
     : "form-control";
 
   const idInputClasses = idHasError ? "form-control invalid" : "form-control";
-
-  console.log(formIsValid);
 
   return (
     <form onSubmit={submitHandler}>
